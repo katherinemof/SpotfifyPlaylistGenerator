@@ -2,7 +2,7 @@ import requests
 import json
 #URLS
 endpoint_url = 'https://api.spotify.com/v1/recommendations?'
-access_token = ''
+access_token = '' #Get access token ! link in read me
 limitsong = 2 #NOTE: limitsong and limitartist must be less than 5 in TOTAL
 limitartist = 3
 personal_artist_url = f'https://api.spotify.com/v1/me/top/artists?limit={limitartist}'
@@ -64,7 +64,7 @@ for i,j in enumerate(json_response['tracks']):
             print(f"{i+1}) \"{j['name']}\" by {j['artists'][0]['name']}")
 
 # CREATE A NEW PLAYLIST
-user_id = "ENTER SPOTIFY USERNAME"
+user_id = "ENTER YOUR SPOTIFY USERNAME" # !! Action
 endpoint_url = f"https://api.spotify.com/v1/users/{user_id}/playlists"
 
 request_body = json.dumps({
