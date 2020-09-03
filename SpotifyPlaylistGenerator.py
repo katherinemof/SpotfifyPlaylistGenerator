@@ -1,9 +1,42 @@
 import requests
 import json
+#URLS
+endpoint_url = 'https://api.spotify.com/v1/recommendations?'
+access_token = ''
+limitsong = 2 #NOTE: limitsong and limitartist must be less than 5 in TOTAL
+limitartist = 3
+personal_artist_url = f'https://api.spotify.com/v1/me/top/artists?limit={limitartist}'
+personal_track_url = f'https://api.spotify.com/v1/me/top/tracks?limit={limitsong}'
 
-endpoint_url = "https://api.spotify.com/v1/recommendations?"
-access_token = 'BQD8xJ3wywk6QKmIAo8osrywPDVVa1aQrWrfPrzYsB2x3MDQaLIUoUGMObJSDVy9jCHGuM_17BbBgqKhgmR2-gyswdOI32kE7LDv_4O47kQ9LmORNIyFAssvzq7voRz-Jqs6Ij4ZXOqeVFHxfsJC6PrmLJnrSOnBrKuMltQAwTIaxvBvrtQjKoG7AYjfGH-AbVC8lvc8fYzdpVHDzTK7YWtqKFy3'
-uris = []
+#Personalisation
+artists = '' #string that will be used in the filters for seed_artist
+response =requests.get(personal_artist_url,
+               headers={"Content-Type":"application/json",
+                        "Authorization":f"Bearer {access_token}"})
+print(response)
+count = 0
+for i in response.json().get("items"):
+    artists+=(str(i.get("id")))
+    if(count != limitartist-1):
+        artists+= ','
+        count+=1
+print(artists)
+
+#get songs
+songs = ''
+response =requests.get(personal_track_url,
+               headers={"Content-Type":"application/json",
+                        "Authorization":f"Bearer {access_token}"})
+print(response)
+count = 0
+
+for i in response.json().get("items"):
+    print(i)
+    songs += (str(i.get("id")))
+    if(count != limitsong-1):
+        songs+= ','
+        count+=1
+print(songs)
 
 
 
@@ -13,44 +46,46 @@ market = "AU"
 seed_genres = "dance"
 target_danceability = 0.8
 valence = '0.1'
-seed_artists = "5cj0lLjcoR7YOSnhnX0Po5,1Xyo4u8uXC1ZmMpatF05PJ"
-
-query = f'{endpoint_url}limit={limit}&market={market}&seed_artists={seed_artists}&valence={valence}&target_danceability={target_danceability}'
+seed_artists = artists
+seed_tracks = songs
+uris = []
+query = f'{endpoint_url}limit={limit}&market={market}&seed_artists={seed_artists}&valence={valence}&target_danceability={target_danceability}&seed_tracks={seed_tracks}'
 
 response =requests.get(query,
                headers={"Content-Type":"application/json",
                         "Authorization":f"Bearer {access_token}"})
 
-json_response = response.json() #JSON data of songs
+print(response)
+json_response = response.json()
+print(json_response)
 
 for i,j in enumerate(json_response['tracks']):
             uris.append(j['uri'])
             print(f"{i+1}) \"{j['name']}\" by {j['artists'][0]['name']}")
 
-'''
-Session 2 - Creating a playlist in Spotify! 
-'''
-
-#CREATE EMPTY PLAYLIST
-user_id = "ENTER YOUR USERNAME or URI" #this is the username you log in with
+# CREATE A NEW PLAYLIST
+user_id = "katherinemof"
 endpoint_url = f"https://api.spotify.com/v1/users/{user_id}/playlists"
 
 request_body = json.dumps({
-          "name": "PYTHON DANCE PLAYLIST",
-          "description": "I made this with Python!!",
-          "public": False # let's keep it between us - for now
+          "name": "Based off top songs and artists",
+          "description": "Based off your music",
+          "public": False
         })
-response = requests.post(url = endpoint_url, data = request_body, headers={"Content-Type":"application/json", "Authorization":"Bearer " + access_token})
-print(response.status_code)
+response = requests.post(url = endpoint_url, data = request_body, headers={"Content-Type":"application/json",
+                       "Authorization":f"Bearer {access_token}"})
 
-#PUT SONGS IN PLAYLIST
+
+print(response.json())
+
+#ADD SONGS TO PLAYLIST
 playlist_id = response.json()['id']
 endpoint_url = f"https://api.spotify.com/v1/playlists/{playlist_id}/tracks"
 
 request_body = json.dumps({
           "uris" : uris
         })
-response = requests.post(url = endpoint_url, data = request_body, headers={"Content-Type":"application/json", "Authorization":f"Bearer {access_token}"})
+response = requests.post(url = endpoint_url, data = request_body, headers={"Content-Type":"application/json",
+                        "Authorization":f"Bearer {access_token}"})
+
 print(response.status_code)
-
-
