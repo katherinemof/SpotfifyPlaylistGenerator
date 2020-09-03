@@ -64,7 +64,7 @@ for i,j in enumerate(json_response['tracks']):
             print(f"{i+1}) \"{j['name']}\" by {j['artists'][0]['name']}")
 
 # CREATE A NEW PLAYLIST
-user_id = "katherinemof"
+user_id = "ENTER SPOTIFY USERNAME"
 endpoint_url = f"https://api.spotify.com/v1/users/{user_id}/playlists"
 
 request_body = json.dumps({
